@@ -110,7 +110,7 @@ API documentation is auto-generated using [Swaggo](https://github.com/swaggo/swa
 - **Echo vs net/http**: Echo provides more features and better DX for REST APIs.
 - **Swagger via Swaggo**: Enables automatic, up-to-date API docs for consumers and developers.
 
-## 4. Makefile Commands
+## 5. Makefile Commands
 
 The following commands are available via `make`:
 
@@ -128,44 +128,47 @@ The following commands are available via `make`:
 | api-docs        | `make api-docs`        | Generates Swagger API documentation.                  |
 | build.docker    | `make build.docker`    | Builds Docker image tagged with the current git hash. |
 
-# 5. Future Improvements
+## 6. Future Improvements
 
 - Schema should be dynamic instead of hardcoded.
 - Add authentication/authorization for config access, at least basic authentication.
 
-## Running with Docker
+## 5. Running with Docker
 
-### Build the Docker image
+You can run the Configuration Manager using Docker. Follow these steps:
 
+### Step 1: Build the Docker image
+
+Run the following command in the project root:
 ```sh
 docker build -t config-manager .
 ```
+This will build a Docker image named `config-manager` using the provided Dockerfile.
 
-### Run the container
+### Step 2: Run the Docker container
 
+Start the container with:
 ```sh
 docker run -d \
   -p 8080:8080 \
-  -e CONFIG_MANAGER_PORT=8080 \
-  -e CONFIG_DB_PATH=/app/data/config.db \
+  -e PORT=8080 \
+  -e DB_PATH=/app/data/config.db \
   -v $(pwd)/data:/app/data \
   --name config-manager \
   config-manager
 ```
-
 - The API will be available at `http://localhost:8080`.
 - Swagger UI will be available at `http://localhost:8080/swagger/index.html`.
 - The SQLite database will be persisted in the `data/` directory on your host.
 
-### Environment Variables
+### Step 3: Environment Variables
 
-- `CONFIG_MANAGER_PORT`: Port to expose the API (default: 8080)
-- `CONFIG_DB_PATH`: Path to the SQLite DB file (default: `/app/data/config.db`)
+- `PORT`: Port to expose the API (default: 8080)
+- `DB_PATH`: Path to the SQLite DB file (default: `./data/config.db` inside the container)
 
-### Notes
+### Step 4: Notes
 
 - The container does **not** support hot-reload (intended for production use).
 - The image is not published to any registry; build locally as needed.
 
 ---
-
