@@ -1,0 +1,137 @@
+# Configuration Manager
+
+## 1. Setup & Running Instructions
+
+### Prerequisites
+- Go 1.20+
+- SQLite3 (for local database)
+
+### Installation
+1. Clone the repository:
+   ```sh
+   git clone <repo-url>
+   cd config-manager
+   ```
+2. Install dependencies:
+   ```sh
+   go mod tidy
+   ```
+3. Run database migrations:
+   ```sh
+   sqlite3 data/config.db < migrations/000001_initial_schema.up.sql
+   ```
+4. Start the server:
+   ```sh
+   go run cmd/server/main.go
+   ```
+   Or build and run:
+   ```sh
+   go build -o bin/config-server cmd/server/main.go
+   ./bin/config-server
+   ```
+
+## 2. Accessing API Documentation (Swagger)
+
+API documentation is auto-generated using [Swaggo](https://github.com/swaggo/swag).
+
+1. Generate docs:
+   ```sh
+   make api-docs
+   ```
+   This will create `docs/swagger.yaml` and `docs/swagger.json`.
+2. Serve Swagger UI:
+   - The server exposes Swagger UI at: `http://localhost:8080/swagger/index.html`
+   - Or use [Swagger Editor](https://editor.swagger.io/) and import `docs/swagger.yaml`.
+
+## 3. Schema Explanation
+
+### Database Schema
+- **configurations**: Stores configuration metadata (name, current version, timestamps)
+- **versions**: Stores each version of configuration data (version number, JSON data, timestamps)
+
+#### Table: configurations
+| Column         | Type    | Description                       |
+| -------------- | ------- | --------------------------------- |
+| name           | TEXT    | Unique config name (PK)           |
+| current_version| INTEGER | Latest version number             |
+| created_at     | TEXT    | Creation timestamp                |
+| updated_at     | TEXT    | Last update timestamp             |
+
+#### Table: versions
+| Column             | Type    | Description                       |
+| ------------------ | ------- | --------------------------------- |
+| id                 | INTEGER | Version row ID (PK)               |
+| configuration_name | TEXT    | Foreign key to configurations     |
+| version_number     | INTEGER | Version number                    |
+| json_data          | TEXT    | Configuration data (JSON)         |
+| created_at         | TEXT    | Version creation timestamp        |
+
+### Configuration Data Schema
+- Each configuration's `data` field must match the expected schema, e.g.:
+  ```json
+  {
+    "max_limit": 1000,
+    "enabled": true
+  }
+  ```
+- Schema validation is enforced by the service layer.
+
+## 4. Design Decisions & Trade-offs
+
+### Why Echo Framework?
+- **Performance**: Echo is lightweight and fast for REST APIs.
+- **Developer Experience**: Simple routing, middleware, and request/response handling.
+- **Swagger Integration**: Easy to use with Swaggo for API docs.
+- **Extensibility**: Supports middleware, validation, and error handling out of the box.
+
+### Why SQLite?
+- **Persistence**: Data survives server restarts, unlike in-memory solutions.
+- **Simplicity**: No external DB server required; file-based, easy to set up.
+- **Transactions**: Supports ACID transactions for safe updates and rollbacks.
+- **Scalability**: Suitable for small/medium projects and local development.
+
+#### Alternatives Considered
+- **File-based (JSON)**: Simpler, but lacks concurrency safety, versioning, and transactional integrity.
+- **In-memory (Map)**: Fast, but data is lost on restart and not suitable for production.
+- **Other DBs**: Overkill for a lightweight config manager; SQLite is sufficient and portable.
+
+### Trade-offs
+- **SQLite vs File-based**: Chose SQLite for reliability, atomic updates, and easy querying/versioning.
+- **Echo vs net/http**: Echo provides more features and better DX for REST APIs.
+- **Swagger via Swaggo**: Enables automatic, up-to-date API docs for consumers and developers.
+
+# 5. Future Improvements
+- Schema should be dynamic instead of hardcoded.
+- Add authentication/authorization for config access, at least basic authentication.
+
+## Running with Docker
+
+### Build the Docker image
+```sh
+docker build -t config-manager .
+```
+
+### Run the container
+```sh
+docker run -d \
+  -p 8080:8080 \
+  -e CONFIG_MANAGER_PORT=8080 \
+  -e CONFIG_DB_PATH=/app/data/config.db \
+  -v $(pwd)/data:/app/data \
+  --name config-manager \
+  config-manager
+```
+- The API will be available at `http://localhost:8080`.
+- Swagger UI will be available at `http://localhost:8080/swagger/index.html`.
+- The SQLite database will be persisted in the `data/` directory on your host.
+
+### Environment Variables
+- `CONFIG_MANAGER_PORT`: Port to expose the API (default: 8080)
+- `CONFIG_DB_PATH`: Path to the SQLite DB file (default: `/app/data/config.db`)
+
+### Notes
+- The container does **not** support hot-reload (intended for production use).
+- The image is not published to any registry; build locally as needed.
+
+---
+

@@ -1,0 +1,15 @@
+meta {
+  name: get config by name
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{process.env.server}}/api/v1/configs/feature-toggle
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

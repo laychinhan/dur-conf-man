@@ -1,0 +1,25 @@
+meta {
+  name: create config
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{process.env.server}}/api/v1/configs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "feature-toggle",
+    "data": {
+      "max_limit": 250,
+      "enabled": true
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

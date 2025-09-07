@@ -1,0 +1,237 @@
+definitions:
+  models.CreateConfigRequest:
+    properties:
+      data:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+    type: object
+  models.ErrorDetail:
+    properties:
+      code:
+        type: string
+      details: {}
+      message:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/models.ErrorDetail'
+      success:
+        type: boolean
+    type: object
+  models.RollbackConfigRequest:
+    properties:
+      target_version:
+        type: integer
+    type: object
+  models.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.UpdateConfigRequest:
+    properties:
+      data:
+        items:
+          type: integer
+        type: array
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/configs:
+    post:
+      consumes:
+      - application/json
+      description: Validates and creates a new configuration with version 1. The request
+        must include a name and JSON data matching the schema.
+      parameters:
+      - description: Configuration data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateConfigRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new configuration
+      tags:
+      - configurations
+  /api/v1/configs/{name}:
+    get:
+      description: Returns the latest configuration data for the given name.
+      parameters:
+      - description: Configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get the latest version of a configuration
+      tags:
+      - configurations
+    put:
+      consumes:
+      - application/json
+      description: Updates the configuration data and increments the version number.
+      parameters:
+      - description: Configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Updated configuration data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateConfigRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update an existing configuration
+      tags:
+      - configurations
+  /api/v1/configs/{name}/rollback:
+    post:
+      consumes:
+      - application/json
+      description: Reverts the configuration to the specified version and increments
+        the current version.
+      parameters:
+      - description: Configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Target version to rollback to
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.RollbackConfigRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Rollback configuration to a previous version
+      tags:
+      - configurations
+  /api/v1/configs/{name}/versions:
+    get:
+      description: Returns a list of all version numbers and their creation timestamps
+        for the specified configuration name.
+      parameters:
+      - description: Configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: List all versions of a configuration
+      tags:
+      - configurations
+  /api/v1/configs/{name}/versions/{version}:
+    get:
+      description: Returns the configuration data for the specified version.
+      parameters:
+      - description: Configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Version number
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a specific version of a configuration
+      tags:
+      - configurations
+swagger: "2.0"

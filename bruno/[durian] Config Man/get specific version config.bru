@@ -1,0 +1,15 @@
+meta {
+  name: get specific version config
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{process.env.server}}/api/v1/configs/feature-toggle/versions/1
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

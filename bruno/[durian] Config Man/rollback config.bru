@@ -1,0 +1,21 @@
+meta {
+  name: rollback config
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{process.env.server}}/api/v1/configs/feature-toggle/rollback
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "target_version": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+}
