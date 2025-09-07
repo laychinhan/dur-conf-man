@@ -1,3 +1,5 @@
+GIT_HASH := $(shell git rev-parse --short HEAD)
+
 .PHONY: format
 format:
 	bin/format.sh
@@ -32,3 +34,11 @@ vendor:
 .PHONY: api-docs
 api-docs:
 	swag init -g cmd/server/main.go --parseDependency --parseInternal
+
+.PHONY: build.docker
+build.docker:
+	docker build -t durian-conf-man:$(GIT_HASH) .
+
+.PHONY: test
+test:
+	go test ./tests/...
