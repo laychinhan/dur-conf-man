@@ -286,17 +286,42 @@
         }
     },
     "definitions": {
+        "ConfigData": {
+            "type": "object",
+            "properties": {
+                "max_limit": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "max_limit",
+                "enabled"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "max_limit": 100,
+                "enabled": true
+            }
+        },
         "models.CreateConfigRequest": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "$ref": "#/definitions/ConfigData"
                 },
                 "name": {
                     "type": "string"
+                }
+            },
+            "example": {
+                "name": "feature_toggle",
+                "data": {
+                    "max_limit": 100,
+                    "enabled": true
                 }
             }
         },
@@ -347,10 +372,13 @@
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "$ref": "#/definitions/ConfigData"
+                }
+            },
+            "example": {
+                "data": {
+                    "max_limit": 200,
+                    "enabled": false
                 }
             }
         }
