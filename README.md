@@ -167,8 +167,7 @@ docker run -d \
 - `DB_PATH`: Path to the SQLite DB file (default: `./data/config.db` inside the container)
 
 ### Step 4: Notes
-
+- Bruno collections is provided inside the `bruno` directory for local development and testing.
 - The container does **not** support hot-reload (intended for production use).
 - The image is not published to any registry; build locally as needed.
-- Bruno collections is provided inside the `bruno` directory for local development and testing.
 ---
