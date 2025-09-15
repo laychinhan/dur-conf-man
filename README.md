@@ -443,7 +443,7 @@ All API responses follow this format:
 - Schema should be dynamic instead of hardcoded.
 - Add authentication/authorization for config access, at least basic authentication.
 
-## 5. Running with Docker
+## 8. Running with Docker
 
 You can run the Configuration Manager using Docker. Follow these steps:
 
