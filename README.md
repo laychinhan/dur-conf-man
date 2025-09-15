@@ -128,7 +128,317 @@ The following commands are available via `make`:
 | api-docs        | `make api-docs`        | Generates Swagger API documentation.                  |
 | build.docker    | `make build.docker`    | Builds Docker image tagged with the current git hash. |
 
-## 6. Future Improvements
+## 6. API Endpoints Documentation
+
+The Configuration Management API provides the following endpoints for managing versioned configurations:
+
+### Base URL
+```
+http://localhost:8080
+```
+
+### 1. Create Configuration
+**POST** `/api/v1/configs`
+
+Creates a new configuration with version 1.
+
+**Request Body:**
+```json
+{
+  "name": "feature-toggle-new",
+  "data": {
+    "max_limit": 500,
+    "enabled": true
+  }
+}
+```
+
+**Example cURL:**
+```bash
+curl -X POST http://localhost:8080/api/v1/configs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "feature-toggle-new",
+    "data": {
+      "max_limit": 500,
+      "enabled": true
+    }
+  }'
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Configuration created successfully",
+  "data": {
+    "name": "feature-toggle-new",
+    "version": 1,
+    "created_at": "2025-09-15T10:30:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request**: Invalid JSON or missing required fields
+- **409 Conflict**: Configuration with the same name already exists
+- **422 Unprocessable Entity**: Data validation failed
+
+---
+
+### 2. Get Latest Configuration
+**GET** `/api/v1/configs/{name}`
+
+Retrieves the latest version of a configuration.
+
+**Path Parameters:**
+- `name` (string): Configuration name
+
+**Example cURL:**
+```bash
+curl -X GET http://localhost:8080/api/v1/configs/feature-toggle-new
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Configuration retrieved successfully",
+  "data": {
+    "name": "feature-toggle-new",
+    "version": 3,
+    "data": {
+      "max_limit": 500,
+      "enabled": true
+    },
+    "created_at": "2025-09-15T10:30:00Z",
+    "updated_at": "2025-09-15T11:45:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**: Configuration does not exist
+
+---
+
+### 3. Update Configuration
+**PUT** `/api/v1/configs/{name}`
+
+Updates an existing configuration and increments the version number.
+
+**Path Parameters:**
+- `name` (string): Configuration name
+
+**Request Body:**
+```json
+{
+  "data": {
+    "max_limit": 800,
+    "enabled": false
+  }
+}
+```
+
+**Example cURL:**
+```bash
+curl -X PUT http://localhost:8080/api/v1/configs/feature-toggle-new \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "max_limit": 800,
+      "enabled": false
+    }
+  }'
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Configuration updated successfully",
+  "data": {
+    "name": "feature-toggle-new",
+    "version": 4,
+    "previous_version": 3,
+    "updated_at": "2025-09-15T12:00:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request**: Invalid JSON or missing data field
+- **404 Not Found**: Configuration does not exist
+- **422 Unprocessable Entity**: Data validation failed
+
+---
+
+### 4. List Configuration Versions
+**GET** `/api/v1/configs/{name}/versions`
+
+Returns a list of all version numbers and their creation timestamps for a configuration.
+
+**Path Parameters:**
+- `name` (string): Configuration name
+
+**Example cURL:**
+```bash
+curl -X GET http://localhost:8080/api/v1/configs/feature-toggle-new/versions
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Configuration versions retrieved successfully",
+  "data": {
+    "name": "feature-toggle-new",
+    "versions": [
+      {
+        "version": 1,
+        "created_at": "2025-09-15T10:30:00Z"
+      },
+      {
+        "version": 2,
+        "created_at": "2025-09-15T10:45:00Z"
+      },
+      {
+        "version": 3,
+        "created_at": "2025-09-15T11:45:00Z"
+      },
+      {
+        "version": 4,
+        "created_at": "2025-09-15T12:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**: Configuration does not exist
+
+---
+
+### 5. Get Specific Configuration Version
+**GET** `/api/v1/configs/{name}/versions/{version}`
+
+Retrieves a specific version of a configuration.
+
+**Path Parameters:**
+- `name` (string): Configuration name
+- `version` (integer): Version number
+
+**Example cURL:**
+```bash
+curl -X GET http://localhost:8080/api/v1/configs/feature-toggle-new/versions/2
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Configuration version retrieved successfully",
+  "data": {
+    "name": "feature-toggle-new",
+    "version": 2,
+    "data": {
+      "max_limit": 300,
+      "enabled": true
+    },
+    "created_at": "2025-09-15T10:45:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request**: Invalid version number
+- **404 Not Found**: Configuration or version does not exist
+
+---
+
+### 6. Rollback Configuration
+**POST** `/api/v1/configs/{name}/rollback`
+
+Reverts the configuration to a specified version and increments the current version.
+
+**Path Parameters:**
+- `name` (string): Configuration name
+
+**Request Body:**
+```json
+{
+  "target_version": 1
+}
+```
+
+**Example cURL:**
+```bash
+curl -X POST http://localhost:8080/api/v1/configs/feature-toggle-new/rollback \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target_version": 1
+  }'
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Configuration rolled back successfully",
+  "data": {
+    "name": "feature-toggle-new",
+    "new_version": 5,
+    "rolled_back_to_version": 1,
+    "rolled_back_at": "2025-09-15T12:15:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request**: Invalid target version or missing target_version field
+- **404 Not Found**: Configuration or target version does not exist
+
+---
+
+### Common Response Format
+
+All API responses follow this format:
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "message": "Operation description",
+  "data": { /* Response data */ }
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human readable error message",
+    "details": { /* Additional error details */ }
+  }
+}
+```
+
+### HTTP Status Codes
+
+- **200 OK**: Request successful
+- **201 Created**: Resource created successfully
+- **400 Bad Request**: Invalid request format or parameters
+- **404 Not Found**: Resource not found
+- **409 Conflict**: Resource already exists
+- **422 Unprocessable Entity**: Validation failed
+- **500 Internal Server Error**: Server error
+
+---
+
+## 7. Future Improvements
 
 - Schema should be dynamic instead of hardcoded.
 - Add authentication/authorization for config access, at least basic authentication.
@@ -170,4 +480,3 @@ docker run -d \
 - Bruno collections is provided inside the `bruno` directory for local development and testing.
 - The container does **not** support hot-reload (intended for production use).
 - The image is not published to any registry; build locally as needed.
----
