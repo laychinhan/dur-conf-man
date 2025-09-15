@@ -298,7 +298,35 @@ const docTemplate = `{
     },
     "definitions": {
         "models.CreateConfigRequest": {
-            "type": "object"
+            "type": "object",
+			"properties": {
+                "name": {
+                    "type": "string",
+                    "example": "feature-toggle-new"
+                },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "max_limit": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 500
+                        },
+                        "enabled": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    }
+                }
+            },
+            "example": {
+                "name": "feature-toggle-new",
+                "data": {
+                    "max_limit": 500,
+                    "enabled": true
+                }
+            }
         },
         "models.ErrorDetail": {
             "type": "object",
@@ -346,11 +374,20 @@ const docTemplate = `{
         },
         "models.UpdateConfigRequest": {
             "type": "object",
-            "properties": {
+			"properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
+                    "type": "object",
+                    "properties": {
+                        "max_limit": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 800
+                        },
+                        "enabled": {
+                            "type": "boolean",
+                            "example": false
+                        }
                     }
                 }
             }
