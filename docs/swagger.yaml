@@ -1,12 +1,5 @@
 definitions:
   models.CreateConfigRequest:
-    properties:
-      data:
-        items:
-          type: integer
-        type: array
-      name:
-        type: string
     type: object
   models.ErrorDetail:
     properties:
@@ -26,6 +19,7 @@ definitions:
   models.RollbackConfigRequest:
     properties:
       target_version:
+        example: 1
         type: integer
     type: object
   models.SuccessResponse:

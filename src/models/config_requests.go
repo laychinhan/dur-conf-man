@@ -3,20 +3,17 @@ package models
 import "encoding/json"
 
 // CreateConfigRequest is the request body for creating a configuration
-// swagger:model
 type CreateConfigRequest struct {
-	Name string          `json:"name"`
-	Data json.RawMessage `json:"data"`
+	Name string          `json:"name" example:"feature_toggle"`
+	Data json.RawMessage `json:"data" swaggertype:"object" example:"{\"max_limit\": 100, \"enabled\": true}"`
 }
 
 // UpdateConfigRequest is the request body for updating a configuration
-// swagger:model
 type UpdateConfigRequest struct {
-	Data json.RawMessage `json:"data"`
+	Data json.RawMessage `json:"data" example: {"max_limit": 100, "enabled": true}`
 }
 
 // RollbackConfigRequest is the request body for rolling back a configuration
-// swagger:model
 type RollbackConfigRequest struct {
-	TargetVersion int `json:"target_version"`
+	TargetVersion int `json:"target_version" example:"1"`
 }

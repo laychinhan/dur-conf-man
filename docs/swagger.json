@@ -1,7 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "title": "Configuration Management API",
+        "description": "API for managing versioned configurations with validation and rollback capabilities.",
+        "version": "1.0.0"
     },
     "paths": {
         "/api/v1/configs": {
@@ -286,41 +288,33 @@
         }
     },
     "definitions": {
-        "ConfigData": {
-            "type": "object",
-            "properties": {
-                "max_limit": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "enabled": {
-                    "type": "boolean"
-                }
-            },
-            "required": [
-                "max_limit",
-                "enabled"
-            ],
-            "additionalProperties": false,
-            "example": {
-                "max_limit": 100,
-                "enabled": true
-            }
-        },
         "models.CreateConfigRequest": {
             "type": "object",
             "properties": {
-                "data": {
-                    "$ref": "#/definitions/ConfigData"
-                },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "feature-toggle-new"
+                },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "max_limit": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 500
+                        },
+                        "enabled": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    }
                 }
             },
             "example": {
-                "name": "feature_toggle",
+                "name": "feature-toggle-new",
                 "data": {
-                    "max_limit": 100,
+                    "max_limit": 500,
                     "enabled": true
                 }
             }
@@ -352,7 +346,8 @@
             "type": "object",
             "properties": {
                 "target_version": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -372,13 +367,19 @@
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/ConfigData"
-                }
-            },
-            "example": {
-                "data": {
-                    "max_limit": 200,
-                    "enabled": false
+                    "type": "object",
+                    "properties": {
+                        "max_limit": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 800
+                        },
+                        "enabled": {
+                            "type": "boolean",
+                            "example": false
+                        }
+                    }
                 }
             }
         }

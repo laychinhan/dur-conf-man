@@ -298,18 +298,7 @@ const docTemplate = `{
     },
     "definitions": {
         "models.CreateConfigRequest": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         },
         "models.ErrorDetail": {
             "type": "object",
@@ -338,7 +327,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "target_version": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
